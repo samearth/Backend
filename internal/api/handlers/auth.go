@@ -49,17 +49,19 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createdUser, err := h.authService.Register(user, &req.Profile, roleData)
+	createdUser, accessToken, refreshToken, err := h.authService.Register(user, &req.Profile, roleData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	resp := map[string]interface{}{
-		"message": "signup successful",
-		"user_id": createdUser.ID.String(),
+		"message":       "signup successful",
+		"user_id":       createdUser.ID.String(),
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
 	}
-	json.NewEncoder(w).Encode(resp)
+	models.JSON(w, http.StatusOK, "success", resp)
 }
 
 type LoginRequest struct {
@@ -86,7 +88,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		"user_id":       user.ID.String(),
 		"role":          user.Role,
 	}
-	json.NewEncoder(w).Encode(resp)
+	models.JSON(w, http.StatusOK, "success", resp)
 }
 
 type RefreshRequest struct {
