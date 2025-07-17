@@ -3,8 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/MentorsPath/Backend/pkg/mailer"
-	"log"
 	"net/http"
 	"net/url"
 
@@ -137,23 +135,10 @@ func (h *AuthHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := h.authService.GeneratePasswordResetToken(req.Email)
+	_, err := h.authService.ForgotPassword(req.Email)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
-	}
-
-	mailer := mailer.NewMailer()
-
-	err = mailer.Send(
-		req.Email,
-		"Mentorspath Password Reset Request",
-		fmt.Sprintf("Click this link to reset your password: https://mentorspath.in/reset?token=%s", token),
-	)
-	if err != nil {
-		log.Printf(" Failed to send email: %v", err)
-	} else {
-		log.Println(" Password reset email sent successfully")
 	}
 
 	models.JSON(w, http.StatusOK, "token generated", "")

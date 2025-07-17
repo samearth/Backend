@@ -2,6 +2,9 @@ package auth
 
 import (
 	"errors"
+	"fmt"
+	"github.com/MentorsPath/Backend/pkg/mailer"
+	"log"
 	"time"
 
 	"github.com/MentorsPath/Backend/database/repositories"
@@ -211,7 +214,7 @@ func (s *AuthService) Refresh(refreshToken string) (*models.User, string, string
 	return user, accessToken, refreshToken, nil
 }
 
-func (s *AuthService) GeneratePasswordResetToken(email string) (string, error) {
+func (s *AuthService) ForgotPassword(email string) (string, error) {
 	user, err := s.userRepo.FindByEmail(email)
 	if err != nil || user == nil {
 		return "", errors.New("user not found")
@@ -227,6 +230,19 @@ func (s *AuthService) GeneratePasswordResetToken(email string) (string, error) {
 	token, err := s.jwtGen.GenerateToken(claims)
 	if err != nil {
 		return "", err
+	}
+
+	mailer := mailer.NewMailer()
+
+	err = mailer.Send(
+		email,
+		"Mentorspath Password Reset Request",
+		fmt.Sprintf("Click this link to reset your mentorspath password: \n \n https://mentorspath.in/reset?token=%s", token),
+	)
+	if err != nil {
+		log.Printf(" Failed to send email: %v", err)
+	} else {
+		log.Println(" Password reset email sent successfully")
 	}
 
 	return token, nil
