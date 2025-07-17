@@ -75,7 +75,7 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 }
 
 type LoginRequest struct {
-	Email    string `json:"mailer"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
