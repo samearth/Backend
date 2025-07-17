@@ -90,9 +90,13 @@ func main() {
 
 	// HTTP Server
 	port := viper.GetString("PORT")
+
+	corsWrappedRouter := middleware.CORSMiddleware(r)
+
 	srv := &http.Server{
-		Addr:         ":" + port,
-		Handler:      r,
+		Addr:    ":" + port,
+		Handler: corsWrappedRouter,
+
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  60 * time.Second,
