@@ -57,7 +57,7 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 
 	resp := map[string]interface{}{
 		"message":       "signup successful",
-		"user_id":       createdUser.ID.String(),
+		"user_id":       createdUser,
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 	}
