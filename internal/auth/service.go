@@ -39,7 +39,7 @@ func (s *AuthService) Register(user *models.User, profile *models.Profile, roleD
 		return nil, "", "", err
 	}
 	if exists {
-		return nil, "", "", errors.New("email already registered")
+		return nil, "", "", errors.New("mailer already registered")
 	}
 
 	// Hash password
@@ -157,7 +157,7 @@ func (s *AuthService) Login(email, plainPassword string) (*models.User, string, 
 func (s *AuthService) generateTokens(user *models.User) (string, string, error) {
 	accessClaims := jwtv5.MapClaims{
 		"user_id": user.ID.String(),
-		"email":   user.Email,
+		"mailer":  user.Email,
 		"role":    user.Role,
 		"exp":     time.Now().Add(15 * time.Minute).Unix(),
 		"iat":     time.Now().Unix(),
@@ -209,4 +209,54 @@ func (s *AuthService) Refresh(refreshToken string) (*models.User, string, string
 	}
 
 	return user, accessToken, refreshToken, nil
+}
+
+func (s *AuthService) GeneratePasswordResetToken(email string) (string, error) {
+	user, err := s.userRepo.FindByEmail(email)
+	if err != nil || user == nil {
+		return "", errors.New("user not found")
+	}
+
+	claims := jwtv5.MapClaims{
+		"user_id": user.ID.String(),
+		"mailer":  user.Email,
+		"exp":     time.Now().Add(15 * time.Minute).Unix(),
+		"iat":     time.Now().Unix(),
+	}
+
+	token, err := s.jwtGen.GenerateToken(claims)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
+}
+
+func (s *AuthService) ResetPassword(token, newPassword string) error {
+	claims, err := s.jwtGen.ValidateToken(token)
+	if err != nil {
+		return errors.New("invalid or expired reset token")
+	}
+
+	userIDStr, ok := claims["user_id"].(string)
+	if !ok {
+		return errors.New("invalid token payload")
+	}
+
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		return err
+	}
+
+	user, err := s.userRepo.FindByID(userID)
+	if err != nil || user == nil {
+		return errors.New("user not found")
+	}
+
+	hashed, err := password.Hash(newPassword)
+	if err != nil {
+		return err
+	}
+
+	return s.userRepo.UpdatePassword(user.ID, hashed)
 }

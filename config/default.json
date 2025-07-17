@@ -4,6 +4,10 @@
   "DB_URL": "root:Mentorspath012#@tcp(mentorspath-database-1.cl22gc6u8ucp.eu-north-1.rds.amazonaws.com:3306)/mentorspath?parseTime=true",
   "REDIS_URL": "redis://localhost:6379",
   "PORT": 8080,
-  "ENVIRONMENT": "development"
+  "ENVIRONMENT": "development",
+  "EMAIL_SENDER":"mentorspath01@gmail.com",
+  "EMAIL_PASSWORD":"fjmw kibx feri xwog",
+  "EMAIL_SMTP_HOST":"smtp.gmail.com",
+  "EMAIL_SMTP_PORT":587
 }
 

@@ -72,6 +72,9 @@ func main() {
 
 	r.HandleFunc("/auth/refresh", authHandler.Refresh).Methods("POST")
 
+	r.HandleFunc("/auth/forgot-password", authHandler.ForgotPassword).Methods("POST")
+	r.HandleFunc("/auth/reset-password", authHandler.ResetPassword).Methods("POST")
+
 	// Protected routesz
 	api := r.PathPrefix("/api").Subrouter()
 	api.Use(middleware.AuthMiddleware(viper.GetString("JWT_SECRET")))

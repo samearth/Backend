@@ -3,6 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/MentorsPath/Backend/pkg/mailer"
+	"log"
 	"net/http"
 	"net/url"
 
@@ -20,7 +22,7 @@ func NewAuthHandler(service *auth.AuthService) *AuthHandler {
 }
 
 type SignupRequest struct {
-	Email    string               `json:"email"`
+	Email    string               `json:"mailer"`
 	Password string               `json:"password"`
 	Role     string               `json:"role"` // "mentor" or "mentee"
 	Profile  *models.ProfileInput `json:"profile"`
@@ -75,7 +77,7 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 }
 
 type LoginRequest struct {
-	Email    string `json:"email"`
+	Email    string `json:"mailer"`
 	Password string `json:"password"`
 }
 
@@ -122,4 +124,57 @@ func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 		"access_token":  newAccessToken,
 		"refresh_token": newRefreshToken,
 	})
+}
+
+type ForgotPasswordRequest struct {
+	Email string `json:"email"`
+}
+
+func (h *AuthHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	var req ForgotPasswordRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	token, err := h.authService.GeneratePasswordResetToken(req.Email)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	mailer := mailer.NewMailer()
+
+	err = mailer.Send(
+		req.Email,
+		"Mentorspath Password Reset Request",
+		fmt.Sprintf("Click this link to reset your password: https://mentorspath.in/reset?token=%s", token),
+	)
+	if err != nil {
+		log.Printf(" Failed to send email: %v", err)
+	} else {
+		log.Println(" Password reset email sent successfully")
+	}
+
+	models.JSON(w, http.StatusOK, "token generated", "")
+}
+
+type ResetPasswordRequest struct {
+	Token       string `json:"token"`
+	NewPassword string `json:"new_password"`
+}
+
+func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
+	var req ResetPasswordRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.authService.ResetPassword(req.Token, req.NewPassword); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	models.JSON(w, http.StatusOK, "password reset successful", nil)
 }

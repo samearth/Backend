@@ -17,6 +17,7 @@ type UserRepository interface {
 	Delete(id uuid.UUID) error
 	EmailExists(email string) (bool, error)
 	UpdateLoginTime(id uuid.UUID, loginTime time.Time) error
+	UpdatePassword(userID uuid.UUID, hashedPassword string) error
 }
 
 type userRepository struct {
@@ -76,8 +77,14 @@ func (r *userRepository) Delete(id uuid.UUID) error {
 
 func (r *userRepository) EmailExists(email string) (bool, error) {
 	var count int64
-	if err := r.db.Model(&models.User{}).Where("email = ?", email).Count(&count).Error; err != nil {
+	if err := r.db.Model(&models.User{}).Where("mailer = ?", email).Count(&count).Error; err != nil {
 		return false, err
 	}
 	return count > 0, nil
+}
+
+func (r *userRepository) UpdatePassword(userID uuid.UUID, hashedPassword string) error {
+	return r.db.Model(&models.User{}).
+		Where("id = ?", userID).
+		Update("password_hash", hashedPassword).Error
 }
