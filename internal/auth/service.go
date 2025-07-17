@@ -59,6 +59,7 @@ func (s *AuthService) Register(user *models.User, profile *models.Profile, roleD
 
 	// Create user
 	createdUser, err := s.userRepo.Create(user)
+	createdUser.Profile = profile
 	if err != nil {
 		return nil, "", "", err
 	}
@@ -75,6 +76,7 @@ func (s *AuthService) Register(user *models.User, profile *models.Profile, roleD
 		if err := s.profileRepo.CreateMentorProfile(mp); err != nil {
 			return nil, "", "", err
 		}
+		createdUser.MentorProfile = mp
 
 	case models.RoleMentee:
 		mp, ok := roleData.(*models.MenteeProfile)
@@ -87,6 +89,8 @@ func (s *AuthService) Register(user *models.User, profile *models.Profile, roleD
 		if err := s.profileRepo.CreateMenteeProfile(mp); err != nil {
 			return nil, "", "", err
 		}
+		createdUser.MenteeProfile = mp
+
 	}
 
 	accessToken, refreshToken, err := s.generateTokens(user)

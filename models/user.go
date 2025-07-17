@@ -48,6 +48,19 @@ type User struct {
 	Skills        []Skill        `gorm:"many2many:user_skills;"`
 }
 
+type ProfileInput struct {
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
+	AvatarURL   string `json:"avatar_url"`
+	ImageURL    string `json:"image_url"`
+	Bio         string `json:"bio"`
+	Headline    string `json:"headline"`
+	WebsiteURL  string `json:"website_url"`
+	LinkedInURL string `json:"linkedin_url"`
+	Twitter     string `json:"twitter"`
+	Timezone    string `json:"timezone"`
+}
+
 type Profile struct {
 	BaseModel
 	FirstName   string `gorm:"size:100;not null"`

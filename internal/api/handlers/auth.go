@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/MentorsPath/Backend/internal/auth"
 	"github.com/MentorsPath/Backend/models"
@@ -21,9 +23,14 @@ type SignupRequest struct {
 	Email      string                `json:"email"`
 	Password   string                `json:"password"`
 	Role       string                `json:"role"` // "mentor" or "mentee"
-	Profile    models.Profile        `json:"profile"`
+	Profile    *models.ProfileInput  `json:"profile"`
 	MentorData *models.MentorProfile `json:"mentor_profile,omitempty"`
 	MenteeData *models.MenteeProfile `json:"mentee_profile,omitempty"`
+}
+
+func generateAvatarURL(name string) string {
+	escapedName := url.QueryEscape(name)
+	return fmt.Sprintf("https://ui-avatars.com/api/?name=%s&background=random&rounded=true", escapedName)
 }
 
 func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +56,20 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createdUser, accessToken, refreshToken, err := h.authService.Register(user, &req.Profile, roleData)
+	profile := &models.Profile{
+		FirstName:   req.Profile.FirstName,
+		LastName:    req.Profile.LastName,
+		Bio:         req.Profile.Bio,
+		AvatarURL:   generateAvatarURL(fmt.Sprintf("%s %s", req.Profile.FirstName, req.Profile.LastName)),
+		ImageURL:    req.Profile.ImageURL,
+		Headline:    req.Profile.Headline,
+		WebsiteURL:  req.Profile.WebsiteURL,
+		LinkedInURL: req.Profile.LinkedInURL,
+		Twitter:     req.Profile.Twitter,
+		Timezone:    req.Profile.Timezone,
+	}
+
+	createdUser, accessToken, refreshToken, err := h.authService.Register(user, profile, roleData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
