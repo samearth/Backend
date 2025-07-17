@@ -20,12 +20,10 @@ func NewAuthHandler(service *auth.AuthService) *AuthHandler {
 }
 
 type SignupRequest struct {
-	Email      string                `json:"email"`
-	Password   string                `json:"password"`
-	Role       string                `json:"role"` // "mentor" or "mentee"
-	Profile    *models.ProfileInput  `json:"profile"`
-	MentorData *models.MentorProfile `json:"mentor_profile,omitempty"`
-	MenteeData *models.MenteeProfile `json:"mentee_profile,omitempty"`
+	Email    string               `json:"email"`
+	Password string               `json:"password"`
+	Role     string               `json:"role"` // "mentor" or "mentee"
+	Profile  *models.ProfileInput `json:"profile"`
 }
 
 func generateAvatarURL(name string) string {
@@ -47,14 +45,6 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var roleData interface{}
-	if req.Role == "mentor" {
-		roleData = req.MentorData
-	} else if req.Role == "mentee" {
-		roleData = req.MenteeData
-	} else {
-		http.Error(w, "Invalid role", http.StatusBadRequest)
-		return
-	}
 
 	profile := &models.Profile{
 		FirstName:   req.Profile.FirstName,

@@ -66,10 +66,25 @@ func (s *AuthService) Register(user *models.User, profile *models.Profile, roleD
 
 	switch user.Role {
 	case models.RoleMentor:
-		mp, ok := roleData.(*models.MentorProfile)
-		if !ok {
-			return nil, "", "", errors.New("invalid mentor profile")
+		mp := &models.MentorProfile{
+			BaseModel: models.BaseModel{
+				ID: uuid.New(),
+			},
+			UserID:                uuid.New(),
+			ProfileID:             uuid.New(),
+			IntroVideoURL:         "",
+			PodcastURL:            "",
+			VerificationStatus:    "",
+			ExpertiseArea:         "",
+			Industry:              "",
+			YearsOfExperience:     nil,
+			CalendlyLink:          "",
+			HourlyRate:            0,
+			IsAcceptingNewMentees: false,
+			AvailableDays:         nil,
+			AvailableTimeSlots:    nil,
 		}
+
 		mp.ID = uuid.New()
 		mp.UserID = createdUser.ID
 		mp.ProfileID = profile.ID
@@ -79,10 +94,19 @@ func (s *AuthService) Register(user *models.User, profile *models.Profile, roleD
 		createdUser.MentorProfile = mp
 
 	case models.RoleMentee:
-		mp, ok := roleData.(*models.MenteeProfile)
-		if !ok {
-			return nil, "", "", errors.New("invalid mentee profile")
+		mp := &models.MenteeProfile{
+			BaseModel: models.BaseModel{
+				ID: uuid.New(),
+			},
+			UserID:         uuid.New(),
+			ProfileID:      uuid.New(),
+			CurrentRole:    "",
+			CurrentCompany: "",
+			LearningGoals:  nil,
+			Interests:      nil,
+			SkillLevel:     "",
 		}
+
 		mp.ID = uuid.New()
 		mp.UserID = createdUser.ID
 		mp.ProfileID = profile.ID
