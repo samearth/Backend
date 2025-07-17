@@ -245,7 +245,7 @@ func (s *AuthService) ForgotPassword(email string) (string, error) {
 		log.Println(" Password reset email sent successfully")
 	}
 
-	return token, nil
+	return token, err
 }
 
 func (s *AuthService) ResetPassword(token, newPassword string) error {
