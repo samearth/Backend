@@ -85,8 +85,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	resp := map[string]interface{}{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
-		"user_id":       user.ID.String(),
-		"role":          user.Role,
+		"user":          user,
 	}
 	models.JSON(w, http.StatusOK, "success", resp)
 }
