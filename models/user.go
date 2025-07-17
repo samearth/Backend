@@ -51,7 +51,7 @@ type User struct {
 type Profile struct {
 	BaseModel
 	FirstName   string `gorm:"size:100;not null"`
-	LastName    string `gorm:"size:100;not null"`
+	LastName    string
 	AvatarURL   string
 	ImageURL    string
 	Bio         string
@@ -59,7 +59,7 @@ type Profile struct {
 	WebsiteURL  string
 	LinkedInURL string
 	Twitter     string `gorm:"size:100"`
-	Timezone    string `gorm:"not null"`
+	Timezone    string
 }
 
 type MentorProfile struct {
