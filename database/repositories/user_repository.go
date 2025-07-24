@@ -77,7 +77,7 @@ func (r *userRepository) Delete(id uuid.UUID) error {
 
 func (r *userRepository) EmailExists(email string) (bool, error) {
 	var count int64
-	if err := r.db.Model(&models.User{}).Where("mailer = ?", email).Count(&count).Error; err != nil {
+	if err := r.db.Model(&models.User{}).Where("email = ?", email).Count(&count).Error; err != nil {
 		return false, err
 	}
 	return count > 0, nil

@@ -5,7 +5,7 @@ import (
 )
 
 type SignupRequest struct {
-	Email     string `json:"mailer" validate:"required,mailer"`
+	Email     string `json:"email" validate:"required,email"`
 	Password  string `json:"password" validate:"required,min=8"`
 	FirstName string `json:"first_name" validate:"required"`
 	LastName  string `json:"last_name" validate:"required"`
@@ -13,14 +13,14 @@ type SignupRequest struct {
 }
 
 type LoginRequest struct {
-	Email    string `json:"mailer" validate:"required,mailer"`
+	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
 }
 
 type LoginResponse struct {
 	User struct {
 		ID    string `json:"id"`
-		Email string `json:"mailer"`
+		Email string `json:"email"`
 		Role  string `json:"role"`
 	} `json:"user"`
 	AccessToken  string `json:"access_token"`
@@ -31,7 +31,7 @@ type LoginResponse struct {
 
 type AccessTokenClaims struct {
 	UserID User   `json:"user"`
-	Email  string `json:"mailer"`
+	Email  string `json:"email"`
 	Role   string `json:"role"` // e.g., "mentor" or "mentee"
 	jwt.RegisteredClaims
 }

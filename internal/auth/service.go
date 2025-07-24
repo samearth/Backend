@@ -42,7 +42,7 @@ func (s *AuthService) Register(user *models.User, profile *models.Profile, roleD
 		return nil, "", "", err
 	}
 	if exists {
-		return nil, "", "", errors.New("mailer already registered")
+		return nil, "", "", errors.New("email already registered")
 	}
 
 	// Hash password
@@ -160,7 +160,7 @@ func (s *AuthService) Login(email, plainPassword string) (*models.User, string, 
 func (s *AuthService) generateTokens(user *models.User) (string, string, error) {
 	accessClaims := jwtv5.MapClaims{
 		"user_id": user.ID.String(),
-		"mailer":  user.Email,
+		"email":   user.Email,
 		"role":    user.Role,
 		"exp":     time.Now().Add(15 * time.Minute).Unix(),
 		"iat":     time.Now().Unix(),
@@ -222,7 +222,7 @@ func (s *AuthService) ForgotPassword(email string) (string, error) {
 
 	claims := jwtv5.MapClaims{
 		"user_id": user.ID.String(),
-		"mailer":  user.Email,
+		"email":   user.Email,
 		"exp":     time.Now().Add(15 * time.Minute).Unix(),
 		"iat":     time.Now().Unix(),
 	}

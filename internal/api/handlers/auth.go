@@ -20,7 +20,7 @@ func NewAuthHandler(service *auth.AuthService) *AuthHandler {
 }
 
 type SignupRequest struct {
-	Email    string               `json:"mailer"`
+	Email    string               `json:"email"`
 	Password string               `json:"password"`
 	Role     string               `json:"role"` // "mentor" or "mentee"
 	Profile  *models.ProfileInput `json:"profile"`
@@ -67,7 +67,7 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 
 	resp := map[string]interface{}{
 		"message":       "signup successful",
-		"user_id":       createdUser,
+		"user":          createdUser,
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 	}
